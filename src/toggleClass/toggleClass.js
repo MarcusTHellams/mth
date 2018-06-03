@@ -19,23 +19,26 @@ function toggleClass(ele, className, force) {
         throw new Error('The third argument for the toggleClass function must be a boolean');
     }
 
+    const classes = className.split(' ');
+
     if (force === undefined) {
-        if (hasClass(ele, className)) {
-            removeClass(ele, className);
-            return hasClass(ele, className);
-        } else if (!hasClass(ele, className)) {
-            addClass(ele, className);
-            return hasClass(ele, className);
-        }
+        M.each(classes, function (i, cla) {
+            if (hasClass(ele, cla)) {
+                removeClass(ele, cla);
+            } else if (!hasClass(ele, cla)) {
+                addClass(ele, cla);
+            }
+        });
+
     } else if (force === true) {
-        addClass(ele, className);
-        return hasClass(ele, className);
+        M.each(classes, function (i, cla) {
+            addClass(ele, cla);
+        });
     } else {
-        removeClass(ele, className);
-        return hasClass(ele, className);
+        M.each(classes, function (i, cla) {
+            removeClass(ele, cla);
+        });
     }
-
-
 };
 
 export default toggleClass;
