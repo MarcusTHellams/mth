@@ -9,7 +9,7 @@ import parents from './parents/';
 
 M.fn.css = function (prop, value) {
     if ((M.isString(prop) && value) || M.isPlainObject(prop)) {
-        this.each(function (ele) {
+        this.each(function (i, ele) {
             css(ele, prop, value);
         });
         return this;
@@ -20,7 +20,7 @@ M.fn.css = function (prop, value) {
 }
 
 M.fn.addClass = function (className) {
-    this.each(function (ele) {
+    this.each(function (i, ele) {
         addClass(ele, className);
     });
 
@@ -28,7 +28,7 @@ M.fn.addClass = function (className) {
 }
 
 M.fn.removeClass = function (className) {
-    this.each(function (ele) {
+    this.each(function (i, ele) {
         removeClass(ele, className);
     });
 
@@ -40,7 +40,7 @@ M.fn.hasClass = function (className) {
 }
 
 M.fn.toggleClass = function (className, force) {
-    this.each(function (ele) {
+    this.each(function (i, ele) {
         toggleClass(ele, className, force);
     });
 

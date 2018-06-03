@@ -20,56 +20,6 @@ const M = function (selector, context) {
     return new M.fn.init(selector, context);
 };
 
-M.fn = M.prototype;
-
-
-M.fn.init = function (selector, context) {
-    if (M.isString(selector)) {
-
-        if (tagRegex.test(selector)) {
-            const ele = doc.createElement(tagRegex.exec(selector)[1]);
-            this.length = 1;
-            this[0] = ele;
-            return this;
-            //end of tag checking
-        }
-
-        if (context) {
-            if (!M.isElement(context) && !(context instanceof M.fn.init)) {
-                throw new Error('Context must be an element or instance of M');
-            }
-
-            if (context instanceof M.fn.init) {
-                const results = context[0][$$](selector);
-                M.merge(this, slice.call(results, 0));
-                return this;
-            }
-            const results = context[$$](selector);
-            M.merge(this, slice.call(results, 0));
-            return this;
-            //end of if context
-        }
-
-        const results = $.call(doc, selector);
-        M.merge(this, slice.call(results, 0));
-        return this;
-
-        //end of is string;
-    }
-
-    if (M.isElement(selector)) {
-        this.length = 1;
-        this[0] = selector;
-        return this;
-    }
-
-    return this;
-};
-
-M.fn.init.prototype = M.prototype;
-
-
-M.each = forEach;
 M.isElement = isElement;
 M.isString = isString;
 M.isBoolean = isBoolean;
@@ -77,6 +27,79 @@ M.isPlainObject = isPlainObject;
 M.camelCase = camelCase;
 M.isArrayLike = isArrayLike;
 M.isFunction = isFunction;
+
+M.fn = M.prototype = {
+    init: function (selector, context) {
+        if (M.isString(selector)) {
+
+            if (tagRegex.test(selector)) {
+                const ele = doc.createElement(tagRegex.exec(selector)[1]);
+                this.length = 1;
+                this[0] = ele;
+                return this;
+                //end of tag checking
+            }
+
+            if (context) {
+                if (!M.isElement(context) && !(context instanceof M.fn.init)) {
+                    throw new Error('Context must be an element or instance of M');
+                }
+
+                if (context instanceof M.fn.init) {
+                    const results = context[0][$$](selector);
+                    M.merge(this, slice.call(results, 0));
+                    return this;
+                }
+                const results = context[$$](selector);
+                M.merge(this, slice.call(results, 0));
+                return this;
+                //end of if context
+            }
+
+            const results = $.call(doc, selector);
+            M.merge(this, slice.call(results, 0));
+            return this;
+
+            //end of is string;
+        }
+
+        if (M.isElement(selector)) {
+            this.length = 1;
+            this[0] = selector;
+            return this;
+        }
+
+        return this;
+    }
+}
+
+
+
+M.fn.init.prototype = M.prototype;
+M.fn.init.constructor = M;
+var _root = M(doc);
+
+M.each = function (obj, callback) {
+    var length, i = 0;
+
+    if (isArrayLike(obj)) {
+        length = obj.length;
+        for (; i < length; i++) {
+            if (callback.call(obj[i], i, obj[i]) === false) {
+                break;
+            }
+        }
+    } else {
+        for (i in obj) {
+            if (callback.call(obj[i], i, obj[i]) === false) {
+                break;
+            }
+        }
+    }
+
+    return obj;
+};
+
 M.extend = function () {
     let output = arguments[0];
     let deep = false;
@@ -115,11 +138,11 @@ M.extend(M.fn, {
             return results;
         }
 
-        if(M.isFunction(fn)){
+        if (M.isFunction(fn)) {
             results = filter.call(this, fn);
         }
 
-        if(M.isElement(fn)){
+        if (M.isElement(fn)) {
             results = this.filter(function (ele) {
                 return M(ele).is(M(fn));
             })
@@ -139,11 +162,18 @@ M.extend(M.fn, {
 });
 
 M.extend(M, {
-    merge: function (merger, mergee, startIndex) {
-        M.each(mergee, (m, i) => {
-            merger[startIndex ? startIndex + i : i] = m;
-            merger.length++;
-        })
+    merge: function (first, second) {
+        var len = +second.length,
+            j = 0,
+            i = first.length;
+
+        for (; j < len; j++) {
+            first[i++] = second[j];
+        }
+
+        first.length = i;
+
+        return first;
     }
 });
 
